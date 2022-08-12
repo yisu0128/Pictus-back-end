@@ -7,4 +7,12 @@ from django.dispatch import receiver
 
 class Profile(models.Model):
     user=models.OneToOneField(User, on_delete=models.CASCADE, primary_key=True)
-    nickname=models.CharField(max_length=128)
+    nickname=models.CharField(max_length=128, null=True)
+    position =models.CharField(max_length=128, null=True)
+    information =models.CharField(max_length=256, null=True)
+    image=models.ImageField(upload_to='profile/', default='default.png')
+
+@receiver(post_save, sender=User)
+def create_user_profile(sender, instance, created, **kwargs):
+    if created:
+        Profile.objects.create(user=instance)
