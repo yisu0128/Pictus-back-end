@@ -20,7 +20,7 @@ class RegisterSerializer(serializers.ModelSerializer):
 
     class Meta:
         model=User
-        fields=['username', 'password','email']
+        fields=['id','username', 'password','email']
     
     def create(self, validated_data):
         user =User.objects.create_user(
@@ -36,19 +36,30 @@ class RegisterSerializer(serializers.ModelSerializer):
 
 
 class LoginSerializer(serializers.Serializer):
-    username=serializers.CharField(required=True)
+    email=serializers.CharField(required=True)
     password=serializers.CharField(required=True, write_only=True)
 
     def validate(self, data):
-        user=authenticate(**data)
-        if user:
-            token=Token.objects.get(user=user)
-            return token
-        raise serializers.ValidationError(
-            {"error":"Unable to log in with provided credentials."}
-        )
+        email=data.get("email",None)
+        password=data.get("password",None)
+
+        if User.objects.filter(email=email).exists():
+            user=User.objects.get(email=email)
+
+            if not user.check_password(password):
+                raise serializers.ValidationError()
+            else:
+                return user
 
 class ProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model=Profile
-        fields=["nickname", "position","information","image"]
+        fields=["url","information","image"]
+
+    
+class ProfileListSerializer(serializers.ModelSerializer):
+    class Meta:
+        model=Profile
+        fields=["user","nickname","url","information","image","email"]
+
+

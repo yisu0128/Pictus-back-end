@@ -1,6 +1,8 @@
 
 from django.db import models
 from django.contrib.auth.models import User
+from django.utils import timezone
+from pictususer.models import Profile
 
 # Create your models here.
 
@@ -25,7 +27,7 @@ class Post(models.Model):
     film=models.ForeignKey(Film, on_delete=models.CASCADE)
     camera=models.ForeignKey(Camera, on_delete=models.CASCADE)
     like=models.ManyToManyField(User, related_name='like')
-    hashtag=models.ManyToManyField(Hashtag,null=True)
+    hashtag=models.ManyToManyField(Hashtag)
 
     def __str__(self):
         return self.image
